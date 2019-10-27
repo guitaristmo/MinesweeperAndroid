@@ -108,7 +108,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
             if(!cells[row][col].flagged)
                 mGameModel.cellClicked(row, col);
             else
-                Toast.makeText(gameContext, "Cannot press flagged tile", Toast.LENGTH_SHORT);
+                Toast.makeText(gameContext, "Cannot press flagged tile", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -58,14 +58,14 @@ public class GameActivity extends AppCompatActivity {
             for (MinesweeperModel.Bomb bomb : args.bombList)
             {
                 mGameboardAdapter.cells[bomb.rowIndex][bomb.colIndex].button.setText("B");
-                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_LONG);
+                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_LONG).show();
             }
         }
 
         @Override
         public void GameWon()
         {
-            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG);
+            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG).show();
         }
 
     }
