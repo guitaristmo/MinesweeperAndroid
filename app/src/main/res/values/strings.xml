@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Minesweeper</string>
     <string name="instructions_text">Choose a board size</string>
-    <string name="small_board_text">8X8 10 bombs</string>
-    <string name="medium_board_text">16X16 20 bombs</string>
-    <string name="large_board_text">20X20 30 bombs</string>
+    <string name="small_board_text">5X5 8 bombs</string>
+    <string name="medium_board_text">7X7 10 bombs</string>
+    <string name="large_board_text">8X8 12 bombs</string>
     <string name="title">Minesweeper</string>
 </resources>

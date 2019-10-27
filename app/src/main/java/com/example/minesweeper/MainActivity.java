@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity
         smallGameButton = findViewById(R.id.small_board_button);
         mediumGameButton = findViewById(R.id.medium_board_button);
         largeGameButton = findViewById(R.id.large_board_button);
-        smallGameButton.setOnClickListener(new ButtonClickListener(8, 8, 10));
-        mediumGameButton.setOnClickListener(new ButtonClickListener(16, 16, 20));
-        largeGameButton.setOnClickListener(new ButtonClickListener(20, 20, 30));
+        smallGameButton.setOnClickListener(new ButtonClickListener(5, 5, 8));
+        mediumGameButton.setOnClickListener(new ButtonClickListener(7, 7, 10));
+        largeGameButton.setOnClickListener(new ButtonClickListener(8, 8, 12));
     }
 
     private class ButtonClickListener implements View.OnClickListener
