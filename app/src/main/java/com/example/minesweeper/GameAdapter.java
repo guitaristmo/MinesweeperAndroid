@@ -22,7 +22,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         this.gameContext = gameContext;
         mGameModel = gameModel;
         cells = new CellButton[mGameModel.rows][mGameModel.cols];
-        //flag
     }
 
     @NonNull

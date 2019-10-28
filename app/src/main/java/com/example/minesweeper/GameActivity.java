@@ -49,7 +49,7 @@ public class GameActivity extends AppCompatActivity {
         {
             int value = mGameModel.board[args.row][args.col].value;
 
-            mGameboardAdapter.cells[args.row][args.col].button.setText(value + "");
+            mGameboardAdapter.cells[args.row][args.col].button.setText(value+"");
         }
 
         @Override
@@ -58,16 +58,24 @@ public class GameActivity extends AppCompatActivity {
             for (MinesweeperModel.Bomb bomb : args.bombList)
             {
                 mGameboardAdapter.cells[bomb.rowIndex][bomb.colIndex].button.setText("B");
-                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_LONG).setAction("New Game", new NewGameListener()).show();
             }
         }
 
         @Override
         public void GameWon()
         {
-            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG).setAction("New Game", new NewGameListener()).show();
         }
 
+    }
+    private class NewGameListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v)
+        {
+            finish();
+        }
     }
 
     private void setupViews()
@@ -76,7 +84,7 @@ public class GameActivity extends AppCompatActivity {
         RecyclerView GameBoardView = findViewById(R.id.recycler_view);
         GameBoardView.setHasFixedSize(true);
 
-        RecyclerView.LayoutManager gameboardLayoutManager = new GridLayoutManager(this, 8);
+        RecyclerView.LayoutManager gameboardLayoutManager = new GridLayoutManager(this, mGameModel.cols);
         mGameboardAdapter = new GameAdapter(this, mGameModel);
 
         GameBoardView.setLayoutManager(gameboardLayoutManager);
