@@ -20,9 +20,8 @@ public class MinesweeperModel implements Serializable
     private boolean initiated;
     private int openCellMethodCounter;
 
-    public MinesweeperModel(CellEventHandlerInterface cellListener, int rows, int cols, int bombCount)
+    public MinesweeperModel(int rows, int cols, int bombCount)
     {
-        this.cellListener = cellListener;
         this.rows = rows;
         this.cols = cols;
         this.bombCount = bombCount;
@@ -91,19 +90,30 @@ public class MinesweeperModel implements Serializable
         if (board[row][col].value == -1)
         {
             cellListener.GameLost(new BombHitEventArgs(bombs));
-//            RaiseBombHitEvent ?.Invoke(this, new BombHitEventArgs(bombs));
             openCellMethodCounter--;
             cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
-//            RaiseOpenCellEvent ?.Invoke(this, new CellEventArgs(row, col, openCellMethodCounter));
         }
             else if (board[row][col].value == 0)
                 emptyCellClicked(row, col);
             else
         {
             openCellMethodCounter--;
-//            RaiseOpenCellEvent ?.Invoke(this, new CellEventArgs(row, col, openCellMethodCounter));
             cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
+            checkGameWon();
         }
+    }
+
+    private void checkGameWon()
+    {
+        for(int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < cols; col++)
+            {
+                if (board[row][col].state == CellStatus.Closed)
+                    return;
+            }
+        }
+        cellListener.GameWon();
     }
 
     public void emptyCellClicked(int row, int col) {
@@ -113,7 +123,6 @@ public class MinesweeperModel implements Serializable
             cellClicked(cell.row, cell.col);
         }
         openCellMethodCounter--;
-//        RaiseOpenCellEvent ?.Invoke(this, new CellEventArgs(row, col, openCellMethodCounter));
         cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
     }
 
@@ -128,6 +137,10 @@ public class MinesweeperModel implements Serializable
         return neighbors;
     }
 
+    public void resetCellHandler(CellEventHandlerInterface handlerInterface)
+    {
+        this.cellListener = handlerInterface;
+    }
 
 
 
@@ -148,7 +161,7 @@ public class MinesweeperModel implements Serializable
         return returnString.toString();
     }
 
-    public class Cell
+    public class Cell implements Serializable
     {
         public int row;
         public int col;
@@ -164,7 +177,7 @@ public class MinesweeperModel implements Serializable
         }
     }
 
-    public class Bomb
+    public class Bomb implements Serializable
     {
         public int rowIndex, colIndex;
         public Bomb(int rowIndex, int colIndex)

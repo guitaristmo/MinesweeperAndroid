@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,13 +36,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
+        System.out.println("onBindViewHolder");
         //good for squares only
         int cellRow = position/mGameModel.rows;
         int cellCol = position % mGameModel.rows;
 
         cells[cellRow][cellCol] = new CellButton(cellRow, cellCol, holder.cell);
+
         holder.cell.setOnClickListener(new CellClickListener(cellRow, cellCol));
         holder.cell.setOnLongClickListener(new CellLongClickListener(cellRow, cellCol));
+        if(mGameModel.board[cellRow][cellCol].state == MinesweeperModel.CellStatus.Open)
+            holder.cell.setText(mGameModel.board[cellRow][cellCol].value+"");
     }
 
     @Override
@@ -108,6 +113,18 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
                 mGameModel.cellClicked(row, col);
             else
                 Toast.makeText(gameContext, "Cannot press flagged tile", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void updateButtons()
+    {
+        for (int row = 0; row < cells.length; row++)
+        {
+            for (int col = 0; col < cells[0].length; col++)
+            {
+                if (mGameModel.board[row][col].state == MinesweeperModel.CellStatus.Open)
+                cells[row][col].button.setText(mGameModel.board[row][col].value+"");
+            }
         }
     }
 
