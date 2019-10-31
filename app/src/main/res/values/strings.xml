@@ -5,4 +5,5 @@
     <string name="medium_board_text">7X7 10 bombs</string>
     <string name="large_board_text">8X8 12 bombs</string>
     <string name="title">Minesweeper</string>
+    <string name="stats_title">Show Stats</string>
 </resources>

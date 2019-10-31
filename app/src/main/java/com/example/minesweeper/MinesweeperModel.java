@@ -15,6 +15,7 @@ public class MinesweeperModel implements Serializable
     public final int bombCount;
     public final int rows;
     public final int cols;
+    public int flags;
     private ArrayList<Bomb> bombs;
     public Cell[][] board;
     private boolean initiated;
@@ -76,7 +77,11 @@ public class MinesweeperModel implements Serializable
         initiated = true;
     }
 
-    public void cellClicked(int row, int col) {
+    public void cellClicked(int row, int col)
+    {
+        if (board[row][col].flagged)
+            return;
+
         //to prevent infinite recursive loops by adjacent empty cells
         if (board[row][col].state == CellStatus.Open)
             return;
@@ -89,16 +94,18 @@ public class MinesweeperModel implements Serializable
 
         if (board[row][col].value == -1)
         {
-            cellListener.GameLost(new BombHitEventArgs(bombs));
+            for (Bomb bomb : bombs)
+                board[bomb.rowIndex][bomb.colIndex].state = CellStatus.Open;
+            cellListener.gameLost(new BombHitEventArgs(bombs));
             openCellMethodCounter--;
-            cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
+            cellListener.openCell(new CellEventArgs(row, col, openCellMethodCounter));
         }
             else if (board[row][col].value == 0)
                 emptyCellClicked(row, col);
             else
         {
             openCellMethodCounter--;
-            cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
+            cellListener.openCell(new CellEventArgs(row, col, openCellMethodCounter));
             checkGameWon();
         }
     }
@@ -113,20 +120,21 @@ public class MinesweeperModel implements Serializable
                     return;
             }
         }
-        cellListener.GameWon();
+        cellListener.gameWon();
     }
 
     public void emptyCellClicked(int row, int col) {
         board[row][col].state = CellStatus.Open;
         for (Cell cell : getNeighbors(row, col))
         {
+            board[row][col].flagged = false;
             cellClicked(cell.row, cell.col);
         }
         openCellMethodCounter--;
-        cellListener.OpenCell(new CellEventArgs(row, col, openCellMethodCounter));
+        cellListener.openCell(new CellEventArgs(row, col, openCellMethodCounter));
     }
 
-    public ArrayList<Cell> getNeighbors(int row, int col) {
+    private ArrayList<Cell> getNeighbors(int row, int col) {
         ArrayList<Cell> neighbors = new ArrayList<Cell>();
         for (int rowCounter = row - 1; rowCounter <= row + 1; rowCounter++) {
             for (int colCounter = col - 1; colCounter <= col + 1; colCounter++) {
@@ -137,14 +145,28 @@ public class MinesweeperModel implements Serializable
         return neighbors;
     }
 
+    public void flagCell(int row, int col)
+    {
+        if (!initiated || board[row][col].state == CellStatus.Open)
+            return;
+        board[row][col].flagged = true;
+        flags++;
+        cellListener.cellFlagged(row, col);
+    }
+
+    public void unflagCell(int row, int col)
+    {
+        if (board[row][col].flagged)
+            flags--;
+        board[row][col].flagged = false;
+        cellListener.cellUnFlagged(row, col);
+    }
+
+
     public void resetCellHandler(CellEventHandlerInterface handlerInterface)
     {
         this.cellListener = handlerInterface;
     }
-
-
-
-
     //Note: row and col start at 0
     public int inspect(int row, int col) {
         return board[row][col].value;
@@ -163,10 +185,11 @@ public class MinesweeperModel implements Serializable
 
     public class Cell implements Serializable
     {
-        public int row;
-        public int col;
+        public final int row;
+        public final int col;
         public int value;
         public MinesweeperModel.CellStatus state;
+        private boolean flagged;
 
         public Cell(int row, int col, int value)
         {
@@ -175,6 +198,7 @@ public class MinesweeperModel implements Serializable
             this.value = value;
             state = CellStatus.Closed;
         }
+        public boolean isFlagged (){return flagged;}
     }
 
     public class Bomb implements Serializable
@@ -210,7 +234,6 @@ public class MinesweeperModel implements Serializable
             this.bombList = bombList;
         }
     }
-
 }
 
 

@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,11 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 {
-    Context gameContext;
-    MinesweeperModel mGameModel;
+    private Context gameContext;
+    private MinesweeperModel mGameModel;
     CellButton[][] cells;
 
-    public GameAdapter(Context gameContext, MinesweeperModel gameModel)
+    GameAdapter(Context gameContext, MinesweeperModel gameModel)
     {
         this.gameContext = gameContext;
         mGameModel = gameModel;
@@ -46,16 +45,26 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         holder.cell.setOnClickListener(new CellClickListener(cellRow, cellCol));
         holder.cell.setOnLongClickListener(new CellLongClickListener(cellRow, cellCol));
         if(mGameModel.board[cellRow][cellCol].state == MinesweeperModel.CellStatus.Open)
-            holder.cell.setText(mGameModel.board[cellRow][cellCol].value+"");
+            holder.cell.setText(getText(mGameModel.board[cellRow][cellCol].value));
+        if(mGameModel.board[cellRow][cellCol].isFlagged())
+            cells[cellRow][cellCol].button.setText("F");
+    }
+
+    String getText(int value)
+    {
+        if (value < 0)
+            return "B";
+        else
+            return String.valueOf(value);
     }
 
     @Override
     public int getItemCount() { return (mGameModel.rows * mGameModel.cols); }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
+    class ViewHolder extends RecyclerView.ViewHolder
     {
         private final Button cell;
-        public ViewHolder(@NonNull View itemView)
+        ViewHolder(@NonNull View itemView)
         {
             super(itemView);
             cell = itemView.findViewById(R.id.cell);
@@ -68,7 +77,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         int row;
         int col;
 
-        public CellLongClickListener(int row, int col)
+        CellLongClickListener(int row, int col)
         {
             this.row = row;
             this.col = col;
@@ -88,11 +97,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
 
     private void toggleCellFlag(int row, int col)
     {
-        cells[row][col].flagged = !cells[row][col].flagged;
-        if (cells[row][col].flagged)
-            cells[row][col].button.setText("F");
+        if (mGameModel.board[row][col].isFlagged())
+            mGameModel.unflagCell(row, col);
         else
-            cells[row][col].button.setText("");
+            mGameModel.flagCell(row, col);
     }
 
     public class CellClickListener implements View.OnClickListener
@@ -100,7 +108,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         int row;
         int col;
 
-        public CellClickListener(int row, int col)
+        CellClickListener(int row, int col)
         {
             this.row = row;
             this.col = col;
@@ -109,24 +117,14 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         @Override
         public void onClick(View view)
         {
-            if(!cells[row][col].flagged)
-                mGameModel.cellClicked(row, col);
-            else
+            mGameModel.cellClicked(row, col);
+
+            if(mGameModel.board[row][col].isFlagged())
                 Toast.makeText(gameContext, "Cannot press flagged tile", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void updateButtons()
-    {
-        for (int row = 0; row < cells.length; row++)
-        {
-            for (int col = 0; col < cells[0].length; col++)
-            {
-                if (mGameModel.board[row][col].state == MinesweeperModel.CellStatus.Open)
-                cells[row][col].button.setText(mGameModel.board[row][col].value+"");
-            }
-        }
-    }
+
 
 
     public class CellButton
@@ -134,16 +132,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         final int row;
         final int col;
         final Button button;
-        boolean flagged;
 
-        public CellButton(int row, int col, Button button)
+        CellButton(int row, int col, Button button)
         {
             this.row = row;
             this.col = col;
             this.button = button;
         }
     }
-
-
 }
 

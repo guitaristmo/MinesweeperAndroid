@@ -2,35 +2,77 @@ package com.example.minesweeper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.ActionBar;
+import android.content.ClipData;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
 public class GameActivity extends AppCompatActivity
 {
+    private static final String TAG = "GAME_ACTIVITY";
     GameAdapter mGameboardAdapter;
     MinesweeperModel mGameModel;
     View gameView;
-    boolean autoSave = true;
+    MenuItem statsItem;
+    TextView flagsView;
+    TextView bombsView;
+    boolean showStats = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
-        System.out.println("onCreate");
 
         setContentView(R.layout.activity_game);
-        if(savedInstanceState == null)
-        {
-            newGameFromBundle();
-            setupViews();
-        }
+        newGameFromBundle();
     }
+
+
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle inBundle)
+    {
+        Log.d(TAG, "onRestoreInstanceState: ");
+        mGameModel = (MinesweeperModel) inBundle.getSerializable("MODEL");
+    }
+
+    @Override
+    protected void onResume()
+    {
+        Log.d(TAG, "onResume: ");
+        super.onResume();
+        mGameModel.resetCellHandler(new CellHandler());
+        setupViews();
+    }
+
+    @Override
+    protected  void onSaveInstanceState(@NonNull Bundle outBundle)
+    {
+        Log.d(TAG, "onSaveInstanceState: ");
+        super.onSaveInstanceState(outBundle);
+        mGameModel.resetCellHandler(null);
+        outBundle.putSerializable("MODEL", mGameModel);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+
+
+
 
     private void setupViews()
     {
@@ -43,37 +85,24 @@ public class GameActivity extends AppCompatActivity
 
         gameBoardView.setLayoutManager(gameboardLayoutManager);
         gameBoardView.setAdapter(mGameboardAdapter);
+
+        flagsView = findViewById(R.id.tv_flags);
+        bombsView = findViewById(R.id.tv_bombs);
+
+
+        updateStats();
     }
 
-    @Override
-    protected  void onSaveInstanceState(@NonNull Bundle outBundle)
+    private void updateStats()
     {
-        System.out.println("onSaveInstanceState");
-        super.onSaveInstanceState(outBundle);
-        outBundle.putSerializable("MODEL", mGameModel);
-        System.out.println("Serialized");
-    }
-
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        mGameModel.resetCellHandler(new CellHandler());
-    }
-
-    @Override
-    protected void onStop()
-    {
-        mGameModel.resetCellHandler(null);
-        super.onStop();
-        System.out.println("OnStop");
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle inBundle)
-    {
-        mGameModel = (MinesweeperModel) inBundle.getSerializable("MODEL");
-        setupViews();
+        if(!showStats)
+        {
+            flagsView.setText("");
+            bombsView.setText("");
+            return;
+        }
+        flagsView.setText("Flags: " + mGameModel.flags);
+        bombsView.setText("Bombs: " + mGameModel.bombCount);
     }
 
     private void newGameFromBundle()
@@ -85,17 +114,24 @@ public class GameActivity extends AppCompatActivity
         mGameModel = new MinesweeperModel(rows, cols, bombs);
     }
 
+    public void stats_listener(MenuItem item)
+    {
+        item.setChecked(!item.isChecked());
+        showStats = item.isChecked();
+        updateStats();
+    }
+
     private class CellHandler implements CellEventHandlerInterface
     {
         @Override
-        public void OpenCell(MinesweeperModel.CellEventArgs args)
+        public void openCell(MinesweeperModel.CellEventArgs args)
         {
             int value = mGameModel.board[args.row][args.col].value;
-            mGameboardAdapter.cells[args.row][args.col].button.setText(value+"");
+            mGameboardAdapter.cells[args.row][args.col].button.setText(mGameboardAdapter.getText(value));
         }
 
         @Override
-        public void GameLost(MinesweeperModel.BombHitEventArgs args)
+        public void gameLost(MinesweeperModel.BombHitEventArgs args)
         {
             for (MinesweeperModel.Bomb bomb : args.bombList)
             {
@@ -112,9 +148,23 @@ public class GameActivity extends AppCompatActivity
             }
         }
         @Override
-        public void GameWon()
+        public void gameWon()
         {
             Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG).setAction("New Game", new NewGameListener()).show();
+        }
+
+        @Override
+        public void cellFlagged(int row, int col)
+        {
+            mGameboardAdapter.cells[row][col].button.setText("F");
+            updateStats();
+        }
+
+        @Override
+        public void cellUnFlagged(int row, int col)
+        {
+            mGameboardAdapter.cells[row][col].button.setText("");
+            updateStats();
         }
 
     }
