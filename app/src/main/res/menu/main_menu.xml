@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/stats_item"
@@ -8,4 +9,8 @@
         android:onClick="stats_listener"
         android:title="@string/stats_title"
         android:visible="true" />
+
+    <item android:title="@string/about_title"
+        android:id="@+id/about_button"
+        android:onClick="AboutListener"/>
 </menu>

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ClipData;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +22,6 @@ public class GameActivity extends AppCompatActivity
     GameAdapter mGameboardAdapter;
     MinesweeperModel mGameModel;
     View gameView;
-    MenuItem statsItem;
     TextView flagsView;
     TextView bombsView;
     boolean showStats = false;
@@ -120,6 +120,13 @@ public class GameActivity extends AppCompatActivity
         showStats = item.isChecked();
         updateStats();
     }
+
+    public void AboutListener(MenuItem item)
+    {
+        Intent aboutScreen = new Intent(getApplicationContext(), AboutActivity.class);
+        startActivity(aboutScreen);
+    }
+
 
     private class CellHandler implements CellEventHandlerInterface
     {

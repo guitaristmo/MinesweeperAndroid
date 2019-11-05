@@ -6,4 +6,7 @@
     <string name="large_board_text">8X8 12 bombs</string>
     <string name="title">Minesweeper</string>
     <string name="stats_title">Show Stats</string>
+    <string name="about_title">About</string>
+    <string name="title_activity_about">About Minesweeper</string>
+    <string name="about_screen_content">This is a traditional game of minesweeper. To learn more about minesweeper, visit: https://en.wikipedia.org/wiki/Minesweeper_(video_game)</string>
 </resources>
