@@ -124,9 +124,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.ViewHolder>
         }
     }
 
-
-
-
     public class CellButton
     {
         final int row;

@@ -43,6 +43,7 @@ public class GameActivity extends AppCompatActivity
     {
         Log.d(TAG, "onRestoreInstanceState: ");
         mGameModel = (MinesweeperModel) inBundle.getSerializable("MODEL");
+        showStats = inBundle.getBoolean("SHOW_STATS");
     }
 
     @Override
@@ -52,6 +53,7 @@ public class GameActivity extends AppCompatActivity
         super.onResume();
         mGameModel.resetCellHandler(new CellHandler());
         setupViews();
+        updateStats();
     }
 
     @Override
@@ -61,6 +63,7 @@ public class GameActivity extends AppCompatActivity
         super.onSaveInstanceState(outBundle);
         mGameModel.resetCellHandler(null);
         outBundle.putSerializable("MODEL", mGameModel);
+        outBundle.putBoolean("SHOW_STATS", showStats);
     }
 
     @Override
@@ -114,7 +117,7 @@ public class GameActivity extends AppCompatActivity
         mGameModel = new MinesweeperModel(rows, cols, bombs);
     }
 
-    public void stats_listener(MenuItem item)
+    public void StatsButtonListener(MenuItem item)
     {
         item.setChecked(!item.isChecked());
         showStats = item.isChecked();
@@ -143,7 +146,7 @@ public class GameActivity extends AppCompatActivity
             for (MinesweeperModel.Bomb bomb : args.bombList)
             {
                 mGameboardAdapter.cells[bomb.rowIndex][bomb.colIndex].button.setText("B");
-                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_LONG).setAction("New Game", new NewGameListener()).show();
+                Snackbar.make(gameView, "You Lost", Snackbar.LENGTH_INDEFINITE).setAction("New Game", new NewGameListener()).show();
             }
 
             for (int row = 0; row < mGameboardAdapter.cells.length; row++)
@@ -157,7 +160,7 @@ public class GameActivity extends AppCompatActivity
         @Override
         public void gameWon()
         {
-            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_LONG).setAction("New Game", new NewGameListener()).show();
+            Snackbar.make(gameView, "You Won!", Snackbar.LENGTH_INDEFINITE).setAction("New Game", new NewGameListener()).show();
         }
 
         @Override

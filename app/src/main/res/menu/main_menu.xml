@@ -6,7 +6,7 @@
         android:id="@+id/stats_item"
         android:checkable="true"
         android:enabled="true"
-        android:onClick="stats_listener"
+        android:onClick="StatsButtonListener"
         android:title="@string/stats_title"
         android:visible="true" />
 

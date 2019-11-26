@@ -115,8 +115,11 @@ public class MinesweeperModel implements Serializable
         for(int row = 0; row < rows; row++)
         {
             for (int col = 0; col < cols; col++)
-            {
-                if (board[row][col].state == CellStatus.Closed)
+            {   //if its closed and not a bomb
+                if (board[row][col].state == CellStatus.Closed && board[row][col].value != -1)
+                    return;
+                //if its a bomb but not flagged
+                if (board[row][col].value != -1 && !board[row][col].isFlagged())
                     return;
             }
         }
